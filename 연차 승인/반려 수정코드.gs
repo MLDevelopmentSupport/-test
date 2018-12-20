@@ -20,11 +20,12 @@ function doGet(e) {
     var para2 = passedInIP.TimeStamp;
     var para3 = passedInIP.sb; //승인 반려
     var para4 = passedInIP.Uname;
-    Logger.log("para2 = " + para2);
+    //Logger.log("para2 = " + para2);
     var SearchData1 = para2; //타임 스탬프
     var SearchData2 = para4; //이름
     
     findInRowForMulti(SearchData1, SearchData2, para1, para3);
+  return ContentService.createTextOutput('수정되었습니다.');
     }
     
 function findInRowForMulti(SearchData1, SearchData2, para1, para3) {
@@ -38,14 +39,14 @@ function findInRowForMulti(SearchData1, SearchData2, para1, para3) {
  var sheet = SpreadsheetApp.openById(SHEET_FILE_ID).getSheetByName("_연차신청정보_LOG_");
  var sheet2 = SpreadsheetApp.openById(SHEET_FILE_ID).getSheetByName("_CODE_");
  //var rows = sheet.getRange(2, 1, sheet.getLastRow(), sheet.getLastColumn()).getValues(); //1st is header row
- var rows = sheet.getRange(2, 1, sheet.getLastRow(), sheet.getLastColumn()).getValues();
+ var rows = sheet.getRange(2, 1, sheet.getLastRow(), 2).getValues();
  Logger.log(rows.length);
  for (var r=0; r<rows.length; r++) {
       Logger.log("rows[2][0] = " + rows[2][0])
    rows[r][0] = Utilities.formatDate(new Date(rows[r][0]),"GMT+0900 (JST)", "yyyy.MM.dd HH:mm:ss");
    Logger.log("SearchData1 = "+ SearchData1)
    Logger.log("rows[r][0] = " + rows[r][0]);
-   //Logger.log(Utilities.formatDate(new Date(rows[r][0]),"GMT+0900 (JST)", "yyyy.MM.dd HH:mm:ss"))
+   Logger.log(Utilities.formatDate(new Date(rows[r][0]),"GMT+0900 (JST)", "yyyy.MM.dd HH:mm:ss"))
    Logger.log("SearchData2 = " +SearchData2)
    Logger.log(rows[2][1])
    /*if ( rows[r][0].indexOf(SearchData1) !== -1 && row[r][1].indexOf(SearchData2) !== -1){
@@ -54,26 +55,24 @@ function findInRowForMulti(SearchData1, SearchData2, para1, para3) {
    else {
    return -1;
    } */
-   if((rows[r][0]) == SearchData1 && ("["+rows[r][1]+"]") == SearchData2){
-     return dataRow = r+1;
-     Logger.log("R = " + r+1)
+   if(((rows[r][0]) == SearchData1) && ((rows[r][1]) == SearchData2)){
+     //Logger.log("R = " + (r+2))
+     dataRow = (r+2);
    }
    else{
-   
-     Logger.log(r + "잘 안됨");
-     
+     Logger.log(r + "잘 안됨"); 
    }
  }
  
     if ( SH == "S"){
-    Logger.log("dataRow = " + dataRow);
+   // Logger.log("dataRow = " + dataRow);
       dataRange = sheet.getRange(dataRow ,16,1,1); // 사용자의 상급자 승인
       
       if (TF == 0){
         data1.push("승인");
         
         var name = sheet.getRange(dataRow,2, 1, 1).getValue(); //신청자 이름
-        Logger.log(name);
+        //Logger.log(name);
         var toname = "행정부"; //받는사람 이름
         var messege = "수신 : " + toname + "<br />발신 : " + name   + "<br/><br/>";//글머리
         var tomail = sheet2.getRange(6,6,1,1).getValue(); // 행정부 메일
@@ -85,12 +84,12 @@ function findInRowForMulti(SearchData1, SearchData2, para1, para3) {
         var href2 = href1 + "sb=0";
         var href3 = href1 + "sb=1";
         var html = "<a href=\""+href2+"\"\">승인</a>....<a href=\""+href3+"\"\">반려</a>";
-        Logger.log(href2 + "," + href3);
+        //Logger.log(href2 + "," + href3);
    //https://ctrlq.org/code/19871-get-post-requests-google-script
         var subject =" TT - 연차승인 검토 1차";//제목
-        Logger.log(subject);
-        Logger.log(messege);
-        Logger.log("="+html);
+        //Logger.log(subject);
+        //Logger.log(messege);
+       // Logger.log("="+html);
         MailApp.sendEmail({
           to: emailAddress,
           // cc: emailCC,
@@ -126,39 +125,40 @@ function findInRowForMulti(SearchData1, SearchData2, para1, para3) {
         
     else if (SH == "H"){
 
-for (var r=0; r<rows.length; r++) {
-      
-   rows[r][0] = Utilities.formatDate(new Date(rows[r][0].valueOf()),"GMT 0900", "yyyy.MM.dd HH:mm:ss");
+      //dataRow = 0;
+      //for (var r=0; r<rows.length; r++) {
+        
+        //rows[r][0] = Utilities.formatDate(new Date(rows[r][0].valueOf()),"GMT 0900", "yyyy.MM.dd HH:mm:ss");
+        
+        /* if ( rows[r].join("#").indexOf(SearchData2) !== null && rows[r].join("#").indexOf(SearchData1) !== null) {
+        
+        } */
+        Logger.log(SearchData1)
+        Logger.log(rows[2][0])
+        //Logger.log(rows[r][0].indexOf(SearchData1))
+        /*if ( rows[r][0].indexOf(SearchData1) !== -1 && row[r][1].indexOf(SearchData2) !== -1){
+        dataRow = r+1;Logger.log("R = " + r+1);
+        }
+        else {
+        Logger.log("잘 안됨");
+        return -1;
+        } */
+        /* if(((rows[r][0]) == SearchData1) && ((rows[r][1]) == SearchData2)){
+          dataRow = (r+2);
+          Logger.log("R = " + (r+1))
+        }
+        else{
+          Logger.log("잘 안됨");
+          return -1;
+        }*/
        
-   /* if ( rows[r].join("#").indexOf(SearchData2) !== null && rows[r].join("#").indexOf(SearchData1) !== null) {
-      
-   } */
-   Logger.log(SearchData1)
-   Logger.log(rows[2][0])
-   Logger.log(rows[r][0].indexOf(SearchData1))
-   /*if ( rows[r][0].indexOf(SearchData1) !== -1 && row[r][1].indexOf(SearchData2) !== -1){
-   dataRow = r+1;Logger.log("R = " + r+1);
-   }
-   else {
-   Logger.log("잘 안됨");
-   return -1;
-   } */
-   if(rows[r][0] == SearchData1 && rows[r][1] == SearchData2){
-     dataRow = r+1;
-     Logger.log("R = " + r+1)
-   }
-   else{
-     Logger.log("잘 안됨");
-     return -1;
-   }
- } 
       dataRange = sheet.getRange(dataRow, 17,1,1);
       
       if (TF == 0){
         data1.push("승인");
         
         var name = "행정부";
-      Logger.log(name);
+      Logger.log("dataRow = " + dataRow);
       var toname = sheet.getRange(dataRow,2, 1, 1).getValue();
       var messege = "수신 : " + toname + "<br />발신 : " + name + "<br/><br/>";//글머리
       var tomail = sheet.getRange(dataRow,3, 1, 1).getValue(); // 신청자 메일
@@ -212,8 +212,8 @@ for (var r=0; r<rows.length; r++) {
         }
     dataRange.setValue(data1);
     }
-    return ContentService.createTextOutput('수정되었습니다.');
-}  
+} 
+
 
 
 //https://developers.google.com/apps-script/guides/web
