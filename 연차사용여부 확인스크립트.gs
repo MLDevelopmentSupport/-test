@@ -1,62 +1,59 @@
 function MonthConfilm() {
   var ss2 = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("_연차신청정보_LOG_");
   var ss3 = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("_CODE_");
-  //var Senior = [];
-  Logger.log(getDataRange.length());
-  Senior = ss2.getRange(2,8,getDataRange.length(),1).getValues(); //상급자 목록 필요함
+  var lists = [];
+  var Senior = [];
+  var rows = ss2.getRange(1, 1, ss2.getLastRow(), 1).getValues();
+  Logger.log(ss2.getDataRange().getValues().length);
+  var tc = ss3.getRange(2,12,1,1).getValue(); //상급자 수
+  Senior = ss3.getRange(2,13,tc,2).getValues(); //상급자 목록 필요함
+  Logger.log(tc)
   //var startDay ;
   //var startDay2 ; 
   //var userList = [];
   //var rows = [];
   //rows = ss2.getRange(2, 1, ss2.getLastRow(), 16).getValues(); //목록들 범위
-  //Logger.log(Senior.length + "//" + rows.length);
+  Logger.log("Senior = "+Senior);
   for(var h = 0; h < Senior.length; h++){
-    for(var i = 0; i < rows.length; i++){
-      Logger.log(rows[i][7] + "//" + Senior[h][0]);
-      if (rows[i][7] == Senior[h][0]){ //상급자 목록 중 하나
-        
-        for (var j = 2; j < rows.length; j++){
-          Logger.log(ss2.getRange(j,5,1,1).getValues());
-          startDay = ss2.getRange(j,5,1,1).getValues();  Logger.log(startDay);
-          startDay2 = new Date(startDay); Logger.log("eeee" + startDay2);
-         Logger.log(startDay2.getMonth())
-         Logger.log(new Date())
-          if(new Date().getMonth()-1 == startDay2.getMonth()){
-            if(rows[i][16] == "승인"){
-              var name = rows[i][2];
-              var dep = rows[i][4]; //부서
-              var endDay = Utilities.formatDate(new Date(rows[i][6]),"GMT+0900 (JST)", "yyyy.MM.dd HH:mm:ss");
-              
-              var href1 = "https://script.google.com/a/totodaud.com/macros/s/AKfycbyhSB7sSHISLtAFi0MV02U1dEru_csp2rTjWZW_8RnymEnYXmml/exec?&Scode=2&Uname="+ name +"&startDay="+startDay+"&endDay="+endDay+"&";
-              var href2 = href1 + "sb=2";
-              var href3 = href1 + "sb=3";
-              var html = "<a href=\""+href2+"\"\">확인됨</a>....<a href=\""+href3+"\"\">확인되지 않음</a>";
-              var contents = dep + "소속 " + name + " - 연차기간 " + startDay + " ~ " + endDay + "<br/>"+html;
-            userList.push(contents)
-            //월이 같으면 순환문 돌리면서 userList에 하나씩 push
-            //푸쉬한 목록도 하나씩 순환문 돌리면서 </br>넣음
-            //</br>뒤에 html로 링크 두개 넣음
-            //얘네 다 메일로 보냄 
-            }
-          }
-        }
-      } //h는 상급자 이름, i는 row  
-    }
-    var emailAddress =  Senior[h+1][0];
-    var email = "ml.dev.spt1@totodaud.com"; //보내는 사람은 어떻게 해야 할까?
-    var name1 = "종합"
-    var subject = userList;
-    var messege = "수신 : " + name + "<br />발신 : " + name  + " 신청" + "<br/><br/>";
-    var html2 = userList;
+    for(var i = 2; i < rows.length; i++){
     
+        //Senior[h][0]
+        var name = Senior[h][0];
+      if (name == ss2.getRange(i,7,1,1).getValue()){
+        
+        var userName = ss2.getRange(i,2,1,1).getValue();
+        var startTime = ss2.getRange(i,5,1,1).getValue();
+        startTime = Utilities.formatDate(new Date(startTime),"GMT+0900 (JST)", "yyyy.MM.dd HH:mm:ss");
+        var endTime = ss2.getRange(i,6,1,1).getValue();
+        endTime = Utilities.formatDate(new Date(endTime),"GMT+0900 (JST)", "yyyy.MM.dd HH:mm:ss");
+        var element = userName + " 기간 : " + startTime + " ~ " + endTime + "<br/>"
+        lists[i].push([element]) 
+      }  Logger.log("lists = " + lists)
+      
+    }
+    var emailAddress =  Senior[h][1];Logger.log(emailAddress) //받는 상급자
+    var email = "ml.dev.spt1@totodaud.com"; //보내는 사람
+    var name1 = "종합";
+    var subject = lists;
+    var messege = "수신 : " + name + "<br />발신 : " + name1 + " 신청" + "<br/><br/>";
+    var html2 = "확인/미확인 <a href="+"https://sites.google.com/a/mitlab.kr/ne_hrd/sang"+">처리 화면으로 이동</a>";
+    if(emailAddress == undefined){
+      return 0; 
+    }
+    else{
     MailApp.sendEmail({
-    to: emailAddress,
-    //cc: emailCC,
-    replyTo : email,
-    name : name1,
-    subject: subject,
-    htmlBody: messege + html2,
+      to: emailAddress,
+      //cc: emailCC,
+      replyTo : email,
+      name : name1,
+      subject: subject,
+      htmlBody: messege + html2,
     });
   }
+  }
  }
+
+//매달 1일에 전송함
+//이전달이 연차 시작인 사람들 리스트 가지고 오기
+//상급자 별로 분류해서 상급자한테 메일 보내기
 
